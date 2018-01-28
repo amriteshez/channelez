@@ -1,0 +1,26 @@
+'use strict';
+
+/**
+ * GWS-521, GWS-533. Scrolls to the anchor hash below sticky navigation bar once bar shows on page top.
+ */
+var AnchorHash={
+
+load: function() {
+  var hash = window.location.hash;
+  if (!hash) return;
+  var hashname = hash.substring(1);
+  var eAnch = jQuery('[data-stk-id=\''+hashname+'\']');
+  if (eAnch) {
+    var anchor = eAnch.attr('data-stk-anchor');
+    var stkFoc = (anchor) ? jQuery('[stk-set-focus=\'' + anchor + '\']') : null;
+    if (stkFoc) {
+      stkFoc.click();
+    }
+  }
+},
+
+};
+
+jQuery(document).ready(function(e){
+  AnchorHash.load();
+});

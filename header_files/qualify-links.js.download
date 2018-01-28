@@ -1,0 +1,3 @@
+function prefixElementAttribute(e,t,r){$(e).each(function(){var e=$(this);e.attr(r,t+e.attr(r))})}$(document).ready(function(){var e="https://www.plm.automation.siemens.com";prefixElementAttribute('a[href^="/global"',e,"href"),prefixElementAttribute('a[href^="/store"',e,"href"),prefixElementAttribute('a[href^="/country"',e,"href"),prefixElementAttribute('a[href^="/resources"',e,"href"),prefixElementAttribute('img[src^="/media"',e,"src"),prefixElementAttribute('option[value^="/global"',e,"value"),prefixElementAttribute('option[value^="/store"',e,"value"),prefixElementAttribute('option[value^="/country"',e,"value")});
+//# sourceMappingURL=qualify-links.js.map
+//# sourceMappingURL=qualify-links.js.map

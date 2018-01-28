@@ -1,0 +1,79 @@
+/*
+ * Cookie Monster Banner constant definition file cmb_const.js: defines constants of Cookie privacy for countries.
+ * Copyright (c) Siemens PLM Software, 2017
+ * @author: mqhc7c
+ */
+var CmDelImgShow=true;
+var CmBnrContentUrl = '/system/privacy/cookie-monster-banner.html';
+var CmDlgContentUrl = '/system/privacy/cookie-monster-popup.html';
+var CmPrivacyUrl = 'https://www.siemens.com/corp/en/index/siemens_ag_cookie_policy.htm';
+var CmDefContent=
+'<div class="nts-notifications dark-text">\n'+
+'  <div class="nts-notification nts-notification-cookie dark-text" style="display: block;">\n'+
+'    <div class="container clearfix">\n'+
+'      <a href="javascript:void(0)" class="pull-right A2"><span class="icon-close"></span></a>\n'+
+'      <div class="row">\n'+
+'        <div class="col-xs-12 col-lg-9">\n'+
+'          <p class="Ps">Cookie Disclaimer</p>\n'+
+'          <p class="P">This site uses cookies in order to improve your user experience and to provide content tailored specifically to your interests. By using this website, you consent to the use of cookies.</p>\n'+
+'          <div class="clearfix">\n'+
+'            <div class="nts-button pull-left">\n'+
+'              <a href="{0}" title="Learn more" target="_blank" rel="noopener">\n'+
+'                <div class="B2">\n'+
+'                  <div class="nts-button-text pull-left">{1}</div>\n'+
+'                  <span class="icon-right icon-ext"></span>\n'+
+'                </div>\n'+
+'              </a>\n'+
+'            </div>\n'+
+'            <div id="nts-set-cookie" class="nts-button">\n'+
+'              <a href="javascript:void(0)" title="OK" id="cm-allow">\n'+
+'                <div class="B2">\n'+
+'                  <div class="nts-button-text">{2}</div>\n'+
+'                </div>\n'+
+'              </a>\n'+
+'            </div>\n'+
+'          </div>\n'+
+'        </div>\n'+
+'      </div>\n'+
+'    </div>\n'+
+'  </div>\n'+
+'</div>\n';
+var $imp = 'implied';
+var $exp = 'express';
+var cmCountry = {
+//country/store sites
+'de-de':$imp,
+'en-ca':$imp,
+'en-de':$imp,
+'en-gb':$imp,
+'en-ie':$imp,
+'en-nl':$imp,
+'en-sg':$imp,
+'en-us':$imp,
+'es-es':$imp,
+'fr-fr':$imp,
+'it-it':$imp,
+'nl-nl':$imp,
+'ja-jp':$imp,
+'ru-ru':$imp,
+'zh-cn':$imp,
+'en-se':$imp,
+'zh-tw':$imp,
+'ko-kr':$imp,
+'en-in':$imp,
+'en-pl':$imp,
+'en-au':$imp,
+'engage':$imp,
+//global sites
+'de':$imp,
+'en':$imp,
+'es':$imp,
+'fr':$imp,
+'it':$imp,
+'ja':$imp,
+'nl':$imp,
+'ru':$imp,
+'ko':$imp,
+'pt':$imp,
+'zh':$imp,
+};

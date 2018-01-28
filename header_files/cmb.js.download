@@ -1,0 +1,243 @@
+/*
+ * Cookie Monster Banner cmb.js: depends on cmb_const.js and jquery, and cmb.css
+ * https://www.plm.automation.siemens.com/
+ *
+ * Copyright (c) Siemens PLM Software, 2017
+ * @author mhqc7c
+ */
+'use strict';
+var CmAllowFlag = {};
+var CmNoBanner = {};
+
+var CmAllowMin = 'A';
+var CmAllow = 'Allow';
+var CmInit = false;
+var CmDomain = '.automation.siemens.com';
+var CmEuCountries=[
+'cz-cz',
+'de-at',
+'de-de',
+'dk-dk',
+'en-gb',
+'es-es',
+'fi-fi',
+'fr-be',
+'fr-fr',
+'it-it',
+'nl-nl',
+'no-no',
+'pl-pl',
+'se-se'
+];
+
+var cuki = jQuery.cookie ? jQuery.cookie : $j.cookie;
+
+var CookieMonster = {
+
+country_: function(xstart){
+  var u='';
+  if(typeof getSitePathPrefix === 'function'){
+    u=getSitePathPrefix();
+    if (u && u.length && u.length > 3) {
+      return u.substring(xstart);
+    }
+  }
+  u = encodeURI(window.location.pathname);
+  var x0= u.indexOf('/', xstart + 2);
+  var x1= x0 + 1;
+  var x = x0 < 0 ? -1 : u.indexOf('/', x1);
+  return (x < 0) ? u.substring(x1) : u.substring(x1,x);
+},
+ctxpath: function(xstart){
+  var u = encodeURI(window.location.pathname);
+  var x0= u.indexOf('/', xstart + 2);
+  var x1= x0 + 1;
+  var x = x0 < 0 ? -1 : u.indexOf('/', x1);
+  return (x < 0) ? u : u.substring(0,x);
+},
+getSitePath: function() {
+  var pp = CookieMonster.ctxpath(0);
+  var spath = pp.indexOf('/global') === 0 ? '/global' : pp;
+  return spath;
+},
+which: function() {
+  var country = CookieMonster.country_(1);
+  var which = cmCountry[country];
+  if (!which) return '';
+  else return which;
+},
+isNotEuCountries: function(){
+  var country = CookieMonster.country_(1);
+  return jQuery.inArray(country, CmEuCountries) < 0;
+},
+createBannerOnPage: function(isDlg) {
+  if(CookieMonster.inited()) return;
+  var cm = jQuery('body');
+  var cmBanner =  jQuery('<div></div>', {id:'cm-banner'});
+  var cmBannerContent = jQuery('<div></div>', {id:'cm-banner-content'});
+  cmBanner.append(cmBannerContent);
+
+  cm.prepend(cmBanner);
+
+  cmBanner.addClass('cm-banner');
+  cmBannerContent = jQuery('div#cm-banner-content').addClass('cm-banner-content').addClass('nts-notifications');
+  cmBanner.hide();
+  CookieMonster.setContent(cmBanner, cmBannerContent, isDlg);
+},
+getDefContent_: function() {
+  var cont = CmDefContent;
+  if (typeof CmDefContent.format === 'function') {
+    cont = CmDefContent.format(CookieMonster.getPrivacyUrl(), 'Learn More', 'OK');
+  } else if (typeof CmDefContent.replace === 'function') {
+    var url = CookieMonster.getPrivacyUrl();
+    cont = CmDefContent.replace('{0}', url).replace('{1}', 'Learn More').replace('{2}', 'OK');
+  }
+  return cont;
+},
+getContentUrl_: function() {
+  var cfg=CookieMonster.which();
+  var r= (cfg === $exp) ? CmDlgContentUrl : CmBnrContentUrl;
+  if (location.search) r = r + location.search;
+  return CookieMonster.ctxpath(1) + r;
+},
+getPrivacyUrl: function(){
+  if(CmPrivacyUrl && CmPrivacyUrl.indexOf('//') >= 0) return CmPrivacyUrl;
+  return CookieMonster.ctxpath(1) + CmPrivacyUrl;
+},
+allow: function(arg) {
+  arg.preventDefault();
+  var cfg = CookieMonster.which();
+  var spath = CookieMonster.getSitePath();
+  cuki('wwwplm-cookiemonster-optout', null, {path:'/', domain:CmDomain});
+  cuki('wwwplm-cookiemonster-optin', true, { expires:2048, path:spath});
+  CmAllowFlag[spath] = true;
+  if (cfg === $imp) {
+    jQuery('div#cm-banner').hide();
+    CmNoBanner[spath] = true;
+  }
+
+  CmInit = false;
+  jQuery(document).trigger('cookie-monster', {message:CmAllowMin, time:new Date()});
+},
+close: function(arg){
+  CookieMonster.allow(arg);
+},
+inited: function(){
+  if(CmInit) return true;
+  var cmb0_ = jQuery('.cm-banner');
+  if(cmb0_ && cmb0_.length && (typeof cmb0_.length == 'number') && cmb0_.length > 1){
+    CmInit = true;
+    return true;
+  }
+  return false;
+},
+postContent: function(cmBanner, cmContentDiv, dlg){
+ try {
+  if (CookieMonster.inited()) {
+    return;
+  }
+  CookieMonster.registerClickHandlersInContent(false);
+  CmInit = true;
+ }
+ finally{
+ }
+},
+setContent: function(cmBanner, cmContentDiv, dlg) {
+  if(CookieMonster.inited()) return;
+  var country = CookieMonster.country_(0);
+  var cmurl = CookieMonster.getContentUrl_();
+  jQuery.ajax({
+    url: cmurl,
+    success: function(result){
+      var cont = jQuery(result).filter('#cookie-monster-message').html();
+      cmContentDiv.append(cont);
+
+      CmAllow=jQuery('div#cm-banner-content .cm-allow').text();
+      if(CmAllow.slice(-1) == '?') CmAllow=CmAllow.slice(0,-1);
+      var t_ = jQuery(result).filter('#cmb-title').text();
+
+      CookieMonster.postContent(cmBanner, cmContentDiv, dlg);
+    },
+    error: function(e) {
+      if(CookieMonster.inited()) return;
+      var cont = CookieMonster.getDefContent_();
+      cmContentDiv.append(cont);
+      CookieMonster.postContent(cmBanner, cmContentDiv, dlg);
+    }
+  });
+},
+isBannerShow: function() {
+  var cmbanner=jQuery('div#cm-banner');
+  return cmbanner && cmbanner.is(':visible');
+},
+/** Main method for other cookie baker.
+ * If trigEvent=true, it triggers event cookie-monster when the return value is true.
+ * Use the following code for call back function:
+ * jQuery('#element').on('cookie-monster', call_back_function);
+ * return: true-> cookie allowed, false-> cookie not allowed 
+ */
+isAllowed: function(trigEvent) {
+  var spath = CookieMonster.getSitePath();
+  var r = !!CmAllowFlag[spath];
+  if(!r){
+    CmAllowFlag[spath] = !!cuki('wwwplm-cookiemonster-optin');
+    r = CmAllowFlag[spath];
+  }
+  if(!r){
+    r = CookieMonster.isNotEuCountries();
+  }
+  if(r === true && trigEvent === true){
+    jQuery(document).trigger('cookie-monster', {message:CmAllowMin, time:new Date()});
+  }
+  return r;
+},
+initBanner: function (e, isPopOver) {
+  var spath = CookieMonster.getSitePath();
+  var alw = (CmAllowFlag[spath] || (CmAllowFlag[spath] = !!cuki('wwwplm-cookiemonster-optin')));
+  if (alw) {
+    return;
+  }
+  if (CookieMonster.inited()) {
+    return;
+  }
+  CookieMonster.createBannerOnPage(isPopOver);
+  var cmDialog = jQuery('div#cm-dialog');
+  if (cmDialog) {
+    cmDialog.hide();
+  }
+  var cmBanner = jQuery('div#cm-banner');
+  if((typeof cmBanner != 'undefined') && (cmBanner.length === 1)){
+    cmBanner.show();
+  }
+},
+registerClickHandlersInContent: function(go) {
+  if(go || !CmInit){
+    var a=jQuery('a#cm-allow');
+    if(a && a.get() && a.get().length) a.click(CookieMonster.allow);
+    var ae=jQuery('a.cm-allow-embedded');
+    if(ae && ae.get() && ae.get().length) ae.click(CookieMonster.allow);
+    jQuery('.nts-notifications a > span.icon-close').on('click', function() { jQuery('div#cm-banner').hide(); });
+  }
+},
+init: function(e) {
+  var cfg = CookieMonster.which();
+  var spath = CookieMonster.getSitePath();
+  CookieMonster.registerClickHandlersInContent(true);
+  if (cfg === $imp) {
+    CookieMonster.initBanner(e, false);
+  }
+  else if (cfg === $exp) {
+    CookieMonster.initBanner(e, true);
+  }
+  else if (CookieMonster.isNotEuCountries()){
+    CmAllowFlag[spath] = true;
+    CookieMonster.isAllowed(true);
+  }
+}
+
+};
+
+jQuery(document).ready(function(e){
+  CookieMonster.init(e);
+});
+
